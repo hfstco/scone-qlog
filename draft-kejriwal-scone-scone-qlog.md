@@ -42,6 +42,7 @@ author:
 normative:
   SCONE: I-D.ietf-scone-protocol
   QLOG-SCHEMA: I-D.ietf-quic-qlog-main-schema
+  QLOG-QUIC: I-D.ietf-quic-qlog-quic-events
   CDDL: RFC8610
 
 informative:
@@ -130,6 +131,11 @@ The packet_sent event is emitted when an endpoint includes a SCONE packet in a d
 SCONEPacketSent = {
   ? datagram_id: uint32
   version: uint32
+  ? dcid: ConnectionID
+  ; Destination Connection ID field of the SCONE packet
+  ? scid: ConnectionID
+  ; Source Connection ID field; empty when the coalesced
+  ; packet has a short header
   rate_signal: SCONERateSignal
   ; expected to be 127 when a packet is sent by an endpoint
   ? trigger: "loss_detected"
@@ -151,6 +157,11 @@ The packet_received event is emitted when an endpoint receives a datagram that b
 SCONEPacketReceived = {
   ? datagram_id: uint32
   version: uint32
+  ? dcid: ConnectionID
+  ; Destination Connection ID field of the SCONE packet
+  ? scid: ConnectionID
+  ; Source Connection ID field; empty when the coalesced
+  ; packet has a short header
   rate_signal: SCONERateSignal
   ? throughput_advice: uint64
   ; bits per second encoded by the rate_signal
@@ -171,6 +182,8 @@ SCONEPacketReceived = {
 }
 ~~~
 {: #fig-received title="CDDL Description of the SCONEPacketReceived Data."}
+
+The `ConnectionID` type is defined in {{Section 8.2 of QLOG-QUIC}}.
 
 The `reason` field MAY be omitted if the value of `outcome` is "discarded", and MUST NOT be present if the value of `outcome` is "accepted".
 
